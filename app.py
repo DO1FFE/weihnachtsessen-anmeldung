@@ -89,4 +89,7 @@ def admin():
     return render_template('admin.html', signups=signups, total_persons=total)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Listen on all interfaces to make the application reachable from outside
+    # the container or local machine. The port is changed to 8086 instead of
+    # Flask's default 5000.
+    app.run(debug=True, host='0.0.0.0', port=8086)
