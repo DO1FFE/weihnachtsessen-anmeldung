@@ -52,8 +52,11 @@ def requires_auth(f):
         return f(*args, **kwargs)
     return decorated
 
-@app.before_first_request
-def create_tables():
+
+# Ensure tables are created when the application starts. The `before_first_request`
+# decorator was removed in Flask 3, so we create the tables explicitly within an
+# application context at import time.
+with app.app_context():
     db.create_all()
 
 @app.route('/', methods=['GET', 'POST'])
