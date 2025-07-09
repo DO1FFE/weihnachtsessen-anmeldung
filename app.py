@@ -62,6 +62,7 @@ with app.app_context():
 @app.route('/', methods=['GET', 'POST'])
 def index():
     message = None
+    show_hint = False
     signup_allowed = date.today() < SIGNUP_DEADLINE
     if request.method == 'POST' and signup_allowed:
         name = request.form.get('name')
@@ -77,12 +78,14 @@ def index():
             db.session.add(signup)
             db.session.commit()
             message = f"Vielen Dank für deine Anmeldung für {signup.persons} Person{'en' if signup.persons != 1 else ''}!"
+            show_hint = True
         else:
             message = 'Name ist erforderlich.'
     elif request.method == 'POST' and not signup_allowed:
         message = 'Die Anmeldefrist ist abgelaufen.'
     total = total_persons()
-    return render_template('index.html', total_persons=total, message=message, signup_allowed=signup_allowed)
+    return render_template('index.html', total_persons=total, message=message,
+                           signup_allowed=signup_allowed, show_hint=show_hint)
 
 @app.route('/admin')
 @requires_auth
