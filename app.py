@@ -91,6 +91,35 @@ def admin():
     total = total_persons()
     return render_template('admin.html', signups=signups, total_persons=total)
 
+
+@app.route('/admin/delete/<int:signup_id>', methods=['POST'])
+@requires_auth
+def delete_signup(signup_id: int):
+    """Delete a signup entry."""
+    signup = Signup.query.get_or_404(signup_id)
+    db.session.delete(signup)
+    db.session.commit()
+    return redirect(url_for('admin'))
+
+
+@app.route('/admin/edit/<int:signup_id>', methods=['GET', 'POST'])
+@requires_auth
+def edit_signup(signup_id: int):
+    """Edit an existing signup."""
+    signup = Signup.query.get_or_404(signup_id)
+    if request.method == 'POST':
+        signup.name = request.form.get('name')
+        signup.callsign = request.form.get('callsign')
+        additional = request.form.get('additional', '0')
+        try:
+            additional = int(additional)
+        except ValueError:
+            additional = 0
+        signup.additional = max(0, min(5, additional))
+        db.session.commit()
+        return redirect(url_for('admin'))
+    return render_template('edit.html', signup=signup)
+
 if __name__ == '__main__':
     # Listen on all interfaces to make the application reachable from outside
     # the container or local machine. The port is changed to 8086 instead of
