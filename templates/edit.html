@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Eintrag bearbeiten</h1>
+<form method="post">
+  <div class="mb-3">
+    <label for="name" class="form-label">Name *</label>
+    <input type="text" id="name" name="name" class="form-control" value="{{ signup.name }}" required>
+  </div>
+  <div class="mb-3">
+    <label for="callsign" class="form-label">Rufzeichen</label>
+    <input type="text" id="callsign" name="callsign" class="form-control" value="{{ signup.callsign }}">
+  </div>
+  <div class="mb-3">
+    <label for="additional" class="form-label">Zusätzliche Personen</label>
+    <input type="number" id="additional" name="additional" class="form-control" min="0" max="5" value="{{ signup.additional }}">
+  </div>
+  <button type="submit" class="btn btn-primary">Speichern</button>
+  <a href="{{ url_for('admin') }}" class="btn btn-secondary">Abbrechen</a>
+</form>
+{% endblock %}

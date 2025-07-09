@@ -9,6 +9,7 @@
       <th>Rufzeichen</th>
       <th>Zusätzliche Personen</th>
       <th>Gesamt</th>
+      <th>Aktionen</th>
     </tr>
   </thead>
   <tbody>
@@ -18,6 +19,12 @@
       <td>{{ s.callsign or '' }}</td>
       <td>{{ s.additional }}</td>
       <td>{{ 1 + s.additional }}</td>
+      <td>
+        <a href="{{ url_for('edit_signup', signup_id=s.id) }}" class="btn btn-sm btn-secondary me-1">Bearbeiten</a>
+        <form method="post" action="{{ url_for('delete_signup', signup_id=s.id) }}" style="display:inline-block">
+          <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Eintrag wirklich löschen?');">Löschen</button>
+        </form>
+      </td>
     </tr>
     {% endfor %}
   </tbody>
