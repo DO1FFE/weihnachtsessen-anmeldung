@@ -25,5 +25,8 @@
 {% endif %}
 {% if message %}
 <div class="alert alert-success mt-3">{{ message }}</div>
+{% if show_hint %}
+<p class="mt-2">Sollte irgendeine Angabe nicht stimmen, bitte umgehend eine kurze Email an <a href="mailto:do1ffe@darc.de">do1ffe@darc.de</a> mit den Änderungswünschen senden.</p>
+{% endif %}
 {% endif %}
 {% endblock %}
