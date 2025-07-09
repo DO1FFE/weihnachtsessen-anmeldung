@@ -1,0 +1,79 @@
+from flask import Flask, render_template, request, redirect, url_for
+from flask_sqlalchemy import SQLAlchemy
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI', 'sqlite:///app.db')
+app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'secret')
+
+db = SQLAlchemy(app)
+
+class Signup(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    callsign = db.Column(db.String(80))
+    additional = db.Column(db.Integer, default=0)
+
+    @property
+    def persons(self):
+        return 1 + (self.additional or 0)
+
+def total_persons():
+    result = db.session.query(db.func.sum(Signup.additional + 1)).scalar()
+    return result or 0
+
+def check_auth(username, password):
+    return username == os.getenv('ADMIN_USERNAME') and password == os.getenv('ADMIN_PASSWORD')
+
+def requires_auth(f):
+    from functools import wraps
+    from flask import request, Response
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return Response(
+                'Authentication required', 401,
+                {'WWW-Authenticate': 'Basic realm="Login Required"'}
+            )
+        return f(*args, **kwargs)
+    return decorated
+
+@app.before_first_request
+def create_tables():
+    db.create_all()
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    message = None
+    if request.method == 'POST':
+        name = request.form.get('name')
+        callsign = request.form.get('callsign')
+        additional = request.form.get('additional', '0')
+        try:
+            additional = int(additional)
+        except ValueError:
+            additional = 0
+        additional = max(0, min(5, additional))
+        if name:
+            signup = Signup(name=name, callsign=callsign, additional=additional)
+            db.session.add(signup)
+            db.session.commit()
+            message = f"Vielen Dank für deine Anmeldung für {signup.persons} Person{'en' if signup.persons != 1 else ''}!"
+        else:
+            message = 'Name ist erforderlich.'
+    total = total_persons()
+    return render_template('index.html', total_persons=total, message=message)
+
+@app.route('/admin')
+@requires_auth
+def admin():
+    signups = Signup.query.all()
+    total = total_persons()
+    return render_template('admin.html', signups=signups, total_persons=total)
+
+if __name__ == '__main__':
+    app.run(debug=True)
