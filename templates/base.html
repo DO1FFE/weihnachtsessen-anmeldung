@@ -8,6 +8,9 @@
 </head>
 <body class="container my-4">
   {% block content %}{% endblock %}
+  <footer class="text-center mt-4">
+    <p>&copy; {{ current_year }} - Erik Schauer - <a href="mailto:do1ffe@darc.de">do1ffe@darc.de</a></p>
+  </footer>
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
