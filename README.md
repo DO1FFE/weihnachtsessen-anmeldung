@@ -20,6 +20,6 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Die Webseite ist anschließend unter `http://localhost:5000` erreichbar.
+Die Webseite ist anschließend unter `http://localhost:8086` erreichbar.
 
-Der Adminbereich befindet sich unter `http://localhost:5000/admin` und ist mit dem in der `.env` Datei angegebenen Benutzernamen und Passwort geschützt.
+Der Adminbereich befindet sich unter `http://localhost:8086/admin` und ist mit dem in der `.env` Datei angegebenen Benutzernamen und Passwort geschützt.
