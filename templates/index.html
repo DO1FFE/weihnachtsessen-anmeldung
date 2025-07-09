@@ -24,10 +24,14 @@
 {% if not signup_allowed %}
 <div class="alert alert-warning mt-3">Die Anmeldung ist geschlossen.</div>
 {% endif %}
-{% if message %}
-<div class="alert alert-success mt-3">{{ message }}</div>
-{% if show_hint %}
-<p class="mt-2">Sollte irgendeine Angabe nicht stimmen, bitte umgehend eine kurze Email an <a href="mailto:do1ffe@darc.de">do1ffe@darc.de</a> mit den Änderungswünschen senden.</p>
-{% endif %}
-{% endif %}
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-success mt-3">{{ message }}</div>
+    {% endfor %}
+    {% if show_hint %}
+    <p class="mt-2">Sollte irgendeine Angabe nicht stimmen, bitte umgehend eine kurze Email an <a href="mailto:do1ffe@darc.de">do1ffe@darc.de</a> mit den Änderungswünschen senden.</p>
+    {% endif %}
+  {% endif %}
+{% endwith %}
 {% endblock %}

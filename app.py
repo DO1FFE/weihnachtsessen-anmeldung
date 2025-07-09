@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from datetime import date
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
@@ -61,30 +61,40 @@ with app.app_context():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    message = None
-    show_hint = False
     signup_allowed = date.today() < SIGNUP_DEADLINE
-    if request.method == 'POST' and signup_allowed:
-        name = request.form.get('name')
-        callsign = request.form.get('callsign')
-        additional = request.form.get('additional', '0')
-        try:
-            additional = int(additional)
-        except ValueError:
-            additional = 0
-        additional = max(0, min(5, additional))
-        if name:
-            signup = Signup(name=name, callsign=callsign, additional=additional)
-            db.session.add(signup)
-            db.session.commit()
-            message = f"Vielen Dank für deine Anmeldung für {signup.persons} Person{'en' if signup.persons != 1 else ''}!"
-            show_hint = True
+    show_hint = request.args.get('show_hint') == '1'
+
+    if request.method == 'POST':
+        if signup_allowed:
+            name = request.form.get('name')
+            callsign = request.form.get('callsign')
+            additional = request.form.get('additional', '0')
+            try:
+                additional = int(additional)
+            except ValueError:
+                additional = 0
+            additional = max(0, min(5, additional))
+            if name:
+                query = Signup.query.filter_by(name=name)
+                if callsign:
+                    query = query.filter_by(callsign=callsign)
+                existing = query.first()
+                if existing:
+                    flash('Name oder Rufzeichen ist bereits angemeldet.')
+                else:
+                    signup = Signup(name=name, callsign=callsign, additional=additional)
+                    db.session.add(signup)
+                    db.session.commit()
+                    flash(f"Vielen Dank für deine Anmeldung für {signup.persons} Person{'en' if signup.persons != 1 else ''}!")
+                    return redirect(url_for('index', show_hint=1))
+            else:
+                flash('Name ist erforderlich.')
         else:
-            message = 'Name ist erforderlich.'
-    elif request.method == 'POST' and not signup_allowed:
-        message = 'Die Anmeldefrist ist abgelaufen.'
+            flash('Die Anmeldefrist ist abgelaufen.')
+        return redirect(url_for('index'))
+
     total = total_persons()
-    return render_template('index.html', total_persons=total, message=message,
+    return render_template('index.html', total_persons=total,
                            signup_allowed=signup_allowed, show_hint=show_hint)
 
 @app.route('/admin')
