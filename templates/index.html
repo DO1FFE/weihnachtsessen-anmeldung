@@ -18,7 +18,7 @@
     <input type="number" id="additional" name="additional" class="form-control" min="0" max="5" value="0">
   </div>
   <p id="person-count">Anmeldung für 1 Person</p>
-  <button type="submit" class="btn btn-primary" {% if not signup_allowed %}disabled{% endif %}>Anmelden</button>
+  <button type="submit" class="btn btn-primary" {% if not signup_allowed %}disabled{% endif %}>Verbindlich anmelden</button>
 </form>
 {% if not signup_allowed %}
 <div class="alert alert-warning mt-3">Die Anmeldung ist geschlossen.</div>
