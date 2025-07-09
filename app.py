@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
+from datetime import date
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 import os
@@ -10,6 +11,15 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI', 'sqlite:///app
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'secret')
 
 db = SQLAlchemy(app)
+
+# Allow signups only until this date (exclusive)
+SIGNUP_DEADLINE = date(2025, 10, 18)
+
+
+@app.context_processor
+def inject_year():
+    """Provide the current year to all templates."""
+    return {'current_year': date.today().year}
 
 class Signup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -49,7 +59,8 @@ def create_tables():
 @app.route('/', methods=['GET', 'POST'])
 def index():
     message = None
-    if request.method == 'POST':
+    signup_allowed = date.today() < SIGNUP_DEADLINE
+    if request.method == 'POST' and signup_allowed:
         name = request.form.get('name')
         callsign = request.form.get('callsign')
         additional = request.form.get('additional', '0')
@@ -65,8 +76,10 @@ def index():
             message = f"Vielen Dank für deine Anmeldung für {signup.persons} Person{'en' if signup.persons != 1 else ''}!"
         else:
             message = 'Name ist erforderlich.'
+    elif request.method == 'POST' and not signup_allowed:
+        message = 'Die Anmeldefrist ist abgelaufen.'
     total = total_persons()
-    return render_template('index.html', total_persons=total, message=message)
+    return render_template('index.html', total_persons=total, message=message, signup_allowed=signup_allowed)
 
 @app.route('/admin')
 @requires_auth
