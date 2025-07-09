@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Adminbereich</h1>
+<p>Gesamte angemeldete Personen: {{ total_persons }}</p>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Rufzeichen</th>
+      <th>Zusätzliche Personen</th>
+      <th>Gesamt</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in signups %}
+    <tr>
+      <td>{{ s.name }}</td>
+      <td>{{ s.callsign or '' }}</td>
+      <td>{{ s.additional }}</td>
+      <td>{{ 1 + s.additional }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
