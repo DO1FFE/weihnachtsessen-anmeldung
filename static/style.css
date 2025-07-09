@@ -1,0 +1,19 @@
+body {
+  background-color: #f0f8ff;
+  color: #003366;
+}
+
+h1, h2, h3, h4, h5 {
+  color: #0059b3;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.alert-success {
+  background-color: #cce5ff;
+  border-color: #b8daff;
+  color: #004085;
+}
