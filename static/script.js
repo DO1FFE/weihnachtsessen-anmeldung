@@ -1,13 +1,17 @@
 document.addEventListener('DOMContentLoaded', function() {
-  function update() {
-    const value = parseInt(document.getElementById('additional').value || '0');
-    const count = 1 + value;
-    document.getElementById('person-count').innerText =
-      'Anmeldung für ' + count + ' Person' + (count > 1 ? 'en' : '');
+  const zusatzfeld = document.getElementById('additional');
+  const anzeige = document.getElementById('person-count');
+
+  if (!zusatzfeld || !anzeige) {
+    return;
   }
-  const input = document.getElementById('additional');
-  if (input) {
-    input.addEventListener('input', update);
-    update();
+
+  function aktualisierePersonen() {
+    const wert = parseInt(zusatzfeld.value || '0', 10);
+    const personen = 1 + wert;
+    anzeige.textContent = 'Anmeldung für ' + personen + ' Person' + (personen > 1 ? 'en' : '');
   }
+
+  zusatzfeld.addEventListener('input', aktualisierePersonen);
+  aktualisierePersonen();
 });

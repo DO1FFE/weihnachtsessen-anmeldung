@@ -1,30 +1,90 @@
 {% extends "base.html" %}
+{% block title %}Anmeldung Weihnachtsessen {{ settings.dinner_date.year }} | DARC Essen-Mitte L11{% endblock %}
 {% block content %}
-<h1>Weihnachtsessen 2025 Anmeldung</h1>
-<p>Das Weihnachtsessen findet am Freitag, 12.12.2025 um 18 Uhr im Parkrestaurant Spindelmann, Palmbuschweg 57, 45326 Essen-Altenessen, statt.</p>
-<p>Bitte daran denken, dass jeder seine Kosten selbst trägt und der Club keine Kosten übernimmt.</p>
-<p>Anmeldeschluss ist Freitag, 17.10.2025 (8 Wochen vor dem Termin). Diese Anmeldung ist verbindlich.</p>
-<p>Bisher angemeldete Personen: {{ total_persons }}</p>
-<form method="post">
-  <div class="mb-3">
-    <label for="name" class="form-label">Name *</label>
-    <input type="text" id="name" name="name" class="form-control" required>
+<section class="heldenbereich" aria-labelledby="seitenueberschrift">
+  <div class="heldenbereich__inhalt">
+    <p class="kennzeichnung">DARC Ortsverband Essen-Mitte L11</p>
+    <h1 id="seitenueberschrift">Weihnachtsessen {{ settings.dinner_date.year }}</h1>
+    <p class="heldenbereich__text">
+      {{ settings.dinner_date|datum_lang }} um 18 Uhr im Parkrestaurant Spindelmann,
+      Palmbuschweg 57, 45326 Essen-Altenessen.
+    </p>
+    <div class="terminleiste" aria-label="Termindaten">
+      <div>
+        <span>Datum</span>
+        <strong>{{ settings.dinner_date|datum }}</strong>
+      </div>
+      <div>
+        <span>Beginn</span>
+        <strong>18:00 Uhr</strong>
+      </div>
+      <div>
+        <span>Anmeldeschluss</span>
+        <strong>{{ settings.signup_deadline|datum }}</strong>
+      </div>
+    </div>
   </div>
-  <div class="mb-3">
-    <label for="callsign" class="form-label">Rufzeichen</label>
-    <input type="text" id="callsign" name="callsign" class="form-control">
+
+  <aside class="statuskarte{% if not signup_allowed %} statuskarte--geschlossen{% endif %}" aria-label="Aktueller Anmeldestand">
+    <span class="statuskarte__titel">Angemeldet</span>
+    <strong>{{ total_persons }}</strong>
+    <span>Personen</span>
+    {% if signup_allowed %}
+      <span class="statusplakette statusplakette--offen">{{ signup_status.label }}</span>
+    {% else %}
+      <span class="statusplakette statusplakette--geschlossen">{{ signup_status.label }}</span>
+    {% endif %}
+  </aside>
+</section>
+
+<section class="inhaltsraster">
+  <div class="hinweisbereich">
+    <h2>Wichtige Hinweise</h2>
+    <ul class="hinweisliste">
+      <li>Die Anmeldung ist verbindlich.</li>
+      <li>Jeder trägt seine Kosten selbst.</li>
+      <li>Der Club übernimmt keine Kosten.</li>
+    </ul>
   </div>
-  <div class="mb-3">
-    <label for="additional" class="form-label">Zusätzliche Personen</label>
-    <input type="number" id="additional" name="additional" class="form-control" min="0" max="5" value="0">
-  </div>
-  <p id="person-count">Anmeldung für 1 Person</p>
-  <button type="submit" class="btn btn-primary" {% if not signup_allowed %}disabled{% endif %}>Verbindlich anmelden</button>
-</form>
+
+  <form method="post" class="anmeldeformular{% if not signup_allowed %} anmeldeformular--geschlossen{% endif %}">
+    <div class="formular-kopf">
+      <p class="kennzeichnung">Verbindliche Anmeldung</p>
+      <h2>Teilnahme eintragen</h2>
+    </div>
+    <div class="mb-3">
+      <label for="name" class="form-label">Name *</label>
+      <input type="text" id="name" name="name" class="form-control" autocomplete="name" {% if not signup_allowed %}disabled{% endif %} required>
+    </div>
+    <div class="mb-3">
+      <label for="callsign" class="form-label">Rufzeichen</label>
+      <input type="text" id="callsign" name="callsign" class="form-control" autocomplete="off" {% if not signup_allowed %}disabled{% endif %}>
+    </div>
+    <div class="mb-3">
+      <label for="additional" class="form-label">Zusätzliche Personen</label>
+      <input type="number" id="additional" name="additional" class="form-control" min="0" max="5" value="0" {% if not signup_allowed %}disabled{% endif %}>
+    </div>
+    <p id="person-count" class="personenzaehler">Anmeldung für 1 Person</p>
+    {% if not signup_allowed %}
+    <div class="formularstatus formularstatus--geschlossen" role="status">
+      <strong>{{ signup_status.label }}</strong>
+      <span>{{ signup_status.message }}</span>
+    </div>
+    {% endif %}
+    <button type="submit" class="btn btn-primary btn-lg w-100" {% if not signup_allowed %}disabled{% endif %}>
+      {% if signup_allowed %}Verbindlich anmelden{% else %}{{ signup_status.label }}{% endif %}
+    </button>
+  </form>
+</section>
+
 {% if not signup_allowed %}
-<div class="alert alert-warning mt-3">Die Anmeldung ist geschlossen.</div>
+<div class="alert alert-warning mt-4" role="alert">{{ signup_status.message }}</div>
 {% endif %}
+
 {% if show_hint %}
-<p class="mt-2">Sollte irgendeine Angabe nicht stimmen, bitte umgehend eine kurze Email an <a href="mailto:do1ffe@darc.de">do1ffe@darc.de</a> mit den Änderungswünschen senden.</p>
+<div class="hinweismeldung mt-4">
+  Sollte irgendeine Angabe nicht stimmen, bitte umgehend eine kurze E-Mail an
+  <a href="mailto:do1ffe@darc.de">do1ffe@darc.de</a> mit den Änderungswünschen senden.
+</div>
 {% endif %}
 {% endblock %}

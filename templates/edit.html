@@ -1,20 +1,28 @@
 {% extends "base.html" %}
+{% block title %}Eintrag bearbeiten | DARC Essen-Mitte L11{% endblock %}
 {% block content %}
-<h1>Eintrag bearbeiten</h1>
-<form method="post">
-  <div class="mb-3">
-    <label for="name" class="form-label">Name *</label>
-    <input type="text" id="name" name="name" class="form-control" value="{{ signup.name }}" required>
-  </div>
-  <div class="mb-3">
-    <label for="callsign" class="form-label">Rufzeichen</label>
-    <input type="text" id="callsign" name="callsign" class="form-control" value="{{ signup.callsign }}">
-  </div>
-  <div class="mb-3">
-    <label for="additional" class="form-label">Zusätzliche Personen</label>
-    <input type="number" id="additional" name="additional" class="form-control" min="0" max="5" value="{{ signup.additional }}">
-  </div>
-  <button type="submit" class="btn btn-primary">Speichern</button>
-  <a href="{{ url_for('admin') }}" class="btn btn-secondary">Abbrechen</a>
-</form>
+<section class="formularseite">
+  <form method="post" class="anmeldeformular">
+    <div class="formular-kopf">
+      <p class="kennzeichnung">Administration</p>
+      <h1>Eintrag bearbeiten</h1>
+    </div>
+    <div class="mb-3">
+      <label for="name" class="form-label">Name *</label>
+      <input type="text" id="name" name="name" class="form-control" value="{{ signup.name }}" autocomplete="name" required>
+    </div>
+    <div class="mb-3">
+      <label for="callsign" class="form-label">Rufzeichen</label>
+      <input type="text" id="callsign" name="callsign" class="form-control" value="{{ signup.callsign }}" autocomplete="off">
+    </div>
+    <div class="mb-3">
+      <label for="additional" class="form-label">Zusätzliche Personen</label>
+      <input type="number" id="additional" name="additional" class="form-control" min="0" max="5" value="{{ signup.additional }}">
+    </div>
+    <div class="formularaktionen">
+      <button type="submit" class="btn btn-primary">Speichern</button>
+      <a href="{{ url_for('admin') }}" class="btn btn-secondary">Abbrechen</a>
+    </div>
+  </form>
+</section>
 {% endblock %}
