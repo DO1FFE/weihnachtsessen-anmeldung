@@ -4,16 +4,23 @@
   --darc-blau: #2aa6da;
   --darc-cyan: #00adef;
   --darc-gold: #f7a900;
+  --tanne: #18584a;
+  --tanne-dunkel: #103c34;
+  --tanne-hell: #e2f0eb;
+  --beere: #a72b32;
+  --beere-dunkel: #751d24;
+  --weihnachtsgold: #d9a536;
+  --weihnachtsgold-hell: #fff5d9;
   --geschlossen: #b3261e;
   --geschlossen-dunkel: #7f1d1d;
   --geschlossen-hell: #fff1f0;
-  --hintergrund: #f4f8fb;
+  --hintergrund: #f1f6f4;
   --flaeche: #ffffff;
-  --flaeche-kuehl: #eaf6fb;
+  --flaeche-kuehl: #edf6f3;
   --text: #1f2933;
   --text-hell: #607083;
-  --rahmen: #d7e3ec;
-  --schatten: 0 18px 45px rgba(39, 61, 94, 0.14);
+  --rahmen: #cfddd8;
+  --schatten: 0 18px 45px rgba(16, 60, 52, 0.14);
 }
 
 * {
@@ -24,7 +31,8 @@ body {
   min-height: 100vh;
   margin: 0;
   background:
-    linear-gradient(180deg, rgba(42, 166, 218, 0.14) 0, rgba(244, 248, 251, 0) 330px),
+    linear-gradient(180deg, rgba(24, 88, 74, 0.15) 0, rgba(241, 246, 244, 0) 360px),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0 1px, transparent 1px 28px),
     var(--hintergrund);
   color: var(--text);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -46,9 +54,31 @@ a:hover {
 }
 
 .kopfbereich {
-  background: var(--darc-dunkel);
-  border-top: 6px solid var(--darc-blau);
+  position: relative;
+  background: linear-gradient(90deg, var(--tanne-dunkel), var(--darc-dunkel) 58%, #174e5b);
   color: #fff;
+}
+
+.kopfbereich::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 6px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--tanne) 0 64px,
+    var(--weihnachtsgold) 64px 70px,
+    var(--beere) 70px 134px,
+    var(--weihnachtsgold) 134px 140px
+  );
+  content: "";
+}
+
+.kopfbereich::after {
+  position: absolute;
+  inset: auto 0 0;
+  height: 1px;
+  background: rgba(217, 165, 54, 0.65);
+  content: "";
 }
 
 .kopfbereich__innen {
@@ -78,9 +108,10 @@ a:hover {
   width: 54px;
   height: 54px;
   place-items: center;
-  border: 2px solid rgba(255, 255, 255, 0.72);
+  border: 2px solid rgba(255, 245, 217, 0.86);
   border-radius: 8px;
-  background: linear-gradient(135deg, var(--darc-cyan), var(--darc-blau));
+  background: linear-gradient(145deg, var(--darc-cyan), #1686a8 72%);
+  box-shadow: inset 0 -4px 0 var(--weihnachtsgold);
   color: #fff;
   font-weight: 800;
 }
@@ -103,8 +134,9 @@ a:hover {
 
 .kopfbereich__kennung {
   padding: 8px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.24);
+  border: 1px solid rgba(255, 245, 217, 0.32);
   border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .hauptinhalt {
@@ -124,9 +156,9 @@ a:hover {
 }
 
 .alert-success {
-  background: #e8f7ef;
-  border-color: #afdcc3;
-  color: #185b37;
+  background: #e6f4ee;
+  border-color: #acd4c6;
+  color: var(--tanne-dunkel);
 }
 
 .alert-warning {
@@ -144,10 +176,11 @@ a:hover {
   gap: 32px;
   align-items: end;
   padding: 42px;
+  border: 1px solid rgba(255, 245, 217, 0.35);
   border-radius: 8px;
   background:
-    linear-gradient(135deg, rgba(39, 61, 94, 0.96), rgba(27, 87, 113, 0.94)),
-    var(--darc-dunkel);
+    linear-gradient(120deg, rgba(16, 60, 52, 0.98) 0, rgba(24, 88, 74, 0.97) 44%, rgba(39, 61, 94, 0.96) 73%, rgba(117, 29, 36, 0.94) 100%),
+    var(--tanne-dunkel);
   box-shadow: var(--schatten);
   color: #fff;
 }
@@ -157,9 +190,43 @@ a:hover {
   inset: 0;
   content: "";
   background:
-    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.11) 0 2px, transparent 2px 18px),
-    linear-gradient(90deg, transparent 0, rgba(42, 166, 218, 0.2) 100%);
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0 1px, transparent 1px 22px),
+    linear-gradient(90deg, transparent 0, rgba(217, 165, 54, 0.12) 100%);
   pointer-events: none;
+}
+
+.heldenbereich::before {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 2;
+  height: 6px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--weihnachtsgold) 0 42px,
+    var(--beere) 42px 84px,
+    #f8fbfa 84px 90px,
+    var(--tanne) 90px 132px,
+    #f8fbfa 132px 138px
+  );
+  content: "";
+}
+
+.heldenbereich__ornament {
+  position: absolute;
+  top: 24px;
+  right: 30px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--weihnachtsgold);
+  font-size: 1.35rem;
+  opacity: 0.9;
+}
+
+.heldenbereich__ornament span:nth-child(2) {
+  color: #fff;
+  font-size: 1.7rem;
 }
 
 .heldenbereich__inhalt,
@@ -170,7 +237,7 @@ a:hover {
 
 .kennzeichnung {
   margin: 0 0 10px;
-  color: var(--darc-blau);
+  color: var(--tanne);
   font-size: 0.8rem;
   font-weight: 800;
   letter-spacing: 0;
@@ -178,7 +245,7 @@ a:hover {
 }
 
 .heldenbereich .kennzeichnung {
-  color: #8dd8f2;
+  color: #f4cf78;
 }
 
 h1,
@@ -187,7 +254,7 @@ h3,
 h4,
 h5 {
   margin-top: 0;
-  color: var(--darc-dunkel);
+  color: var(--tanne-dunkel);
   font-weight: 800;
 }
 
@@ -227,8 +294,8 @@ h5 {
 .terminleiste div {
   min-height: 82px;
   padding: 14px 16px;
-  border-color: rgba(255, 255, 255, 0.26);
-  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 245, 217, 0.29);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .terminleiste span,
@@ -254,8 +321,8 @@ h5 {
 
 .statuskarte {
   padding: 24px;
-  border-color: rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 245, 217, 0.38);
+  background: rgba(255, 255, 255, 0.13);
   backdrop-filter: blur(10px);
 }
 
@@ -286,8 +353,9 @@ h5 {
 }
 
 .statuskarte .statusplakette--offen {
-  background: rgba(214, 245, 226, 0.95);
-  color: #175c34;
+  background: var(--weihnachtsgold-hell);
+  color: var(--tanne-dunkel);
+  box-shadow: 0 0 0 3px rgba(217, 165, 54, 0.22);
 }
 
 .statuskarte .statusplakette--geschlossen {
@@ -317,15 +385,25 @@ h5 {
 .anmeldeformular,
 .tabellenbereich {
   padding: 28px;
-  box-shadow: 0 14px 32px rgba(39, 61, 94, 0.08);
+  box-shadow: 0 14px 32px rgba(16, 60, 52, 0.08);
 }
 
 .hinweisbereich {
-  background: linear-gradient(180deg, #fff, var(--flaeche-kuehl));
+  border-top: 4px solid var(--weihnachtsgold);
+  background: linear-gradient(180deg, #fff, #f4f9f7);
+}
+
+.anmeldeformular {
+  border-top: 4px solid var(--tanne);
+}
+
+.tabellenbereich {
+  border-top: 4px solid var(--darc-blau);
 }
 
 .anmeldeformular--geschlossen {
   border-color: #ffb4ab;
+  border-top-color: var(--geschlossen);
   box-shadow: 0 14px 32px rgba(127, 29, 29, 0.12);
 }
 
@@ -356,7 +434,8 @@ h5 {
   width: 8px;
   height: 8px;
   border-radius: 999px;
-  background: var(--darc-gold);
+  background: var(--beere);
+  box-shadow: 0 0 0 3px rgba(217, 165, 54, 0.2);
   content: "";
 }
 
@@ -377,8 +456,8 @@ h5 {
 }
 
 .form-control:focus {
-  border-color: var(--darc-blau);
-  box-shadow: 0 0 0 0.22rem rgba(42, 166, 218, 0.22);
+  border-color: var(--tanne);
+  box-shadow: 0 0 0 0.22rem rgba(24, 88, 74, 0.18);
 }
 
 .form-control:disabled {
@@ -394,8 +473,9 @@ h5 {
   align-items: center;
   padding: 8px 12px;
   border-radius: 8px;
-  background: var(--flaeche-kuehl);
-  color: var(--darc-dunkel);
+  border: 1px solid #ead394;
+  background: var(--weihnachtsgold-hell);
+  color: var(--tanne-dunkel);
   font-weight: 800;
 }
 
@@ -429,15 +509,15 @@ h5 {
 }
 
 .btn-primary {
-  background: var(--darc-blau);
-  border-color: var(--darc-blau);
+  background: var(--tanne);
+  border-color: var(--tanne);
   color: #fff;
 }
 
 .btn-primary:hover,
 .btn-primary:focus {
-  background: #208fc0;
-  border-color: #208fc0;
+  background: var(--tanne-dunkel);
+  border-color: var(--tanne-dunkel);
 }
 
 .btn-primary:disabled {
@@ -465,10 +545,10 @@ h5 {
 
 .hinweismeldung {
   padding: 18px 20px;
-  border: 1px solid #b8dced;
+  border: 1px solid #b5d7cb;
   border-radius: 8px;
-  background: #eef9fd;
-  color: var(--darc-dunkel);
+  background: #eef8f4;
+  color: var(--tanne-dunkel);
 }
 
 .seitenkopf {
@@ -490,6 +570,7 @@ h5 {
 
 .einstellungenformular {
   width: 100%;
+  border-top-color: var(--weihnachtsgold);
 }
 
 .einstellungenraster {
@@ -507,7 +588,7 @@ h5 {
   border: 1px solid var(--rahmen);
   border-radius: 8px;
   background: var(--flaeche-kuehl);
-  color: var(--darc-dunkel);
+  color: var(--tanne-dunkel);
   cursor: pointer;
 }
 
@@ -515,7 +596,7 @@ h5 {
   width: 22px;
   height: 22px;
   flex: 0 0 auto;
-  accent-color: var(--darc-blau);
+  accent-color: var(--tanne);
 }
 
 .schalter strong,
@@ -534,11 +615,12 @@ h5 {
   padding: 18px 22px;
   text-align: right;
   box-shadow: 0 12px 26px rgba(39, 61, 94, 0.08);
+  border-top: 4px solid var(--beere);
 }
 
 .kennzahl strong {
   display: block;
-  color: var(--darc-dunkel);
+  color: var(--tanne-dunkel);
   font-size: 2.6rem;
   line-height: 1;
 }
@@ -549,7 +631,8 @@ h5 {
 
 .anmeldetabelle thead th {
   border-bottom: 1px solid var(--rahmen);
-  color: var(--darc-dunkel);
+  background: #f1f7f5;
+  color: var(--tanne-dunkel);
   font-size: 0.9rem;
 }
 
@@ -591,7 +674,8 @@ h5 {
 
 .fussbereich {
   padding: 24px 16px;
-  background: var(--darc-dunkel);
+  border-top: 4px solid var(--weihnachtsgold);
+  background: linear-gradient(90deg, var(--tanne-dunkel), var(--darc-dunkel) 62%, #174e5b);
   color: rgba(255, 255, 255, 0.78);
   text-align: center;
 }
@@ -627,6 +711,10 @@ h5 {
   .heldenbereich {
     min-height: auto;
     padding: 28px;
+  }
+
+  .heldenbereich__ornament {
+    display: none;
   }
 
   .terminleiste {
