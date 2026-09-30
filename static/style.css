@@ -629,6 +629,18 @@ h5 {
   margin-bottom: 0;
 }
 
+.bereichskopf {
+  display: flex;
+  margin-bottom: 22px;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.bereichskopf h2 {
+  margin-bottom: 0;
+}
+
 .anmeldetabelle thead th {
   border-bottom: 1px solid var(--rahmen);
   background: #f1f7f5;
@@ -655,6 +667,108 @@ h5 {
   padding: 34px 10px !important;
   color: var(--text-hell);
   text-align: center;
+}
+
+.archivbereich {
+  margin-top: 28px;
+  padding: 28px 0 0;
+  border-top: 1px solid var(--rahmen);
+}
+
+.archivsummen {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.archivsummen span {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid var(--rahmen);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text-hell);
+}
+
+.archivsummen strong {
+  color: var(--tanne-dunkel);
+  font-size: 1.12rem;
+}
+
+.archivveranstaltung {
+  overflow: hidden;
+  margin-top: 14px;
+  border: 1px solid var(--rahmen);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(16, 60, 52, 0.06);
+}
+
+.archivveranstaltung summary {
+  display: flex;
+  min-height: 74px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px 20px;
+  border-left: 4px solid var(--weihnachtsgold);
+  background: #f4f9f7;
+  color: var(--tanne-dunkel);
+  cursor: pointer;
+  list-style: none;
+}
+
+.archivveranstaltung summary::-webkit-details-marker {
+  display: none;
+}
+
+.archivveranstaltung summary::after {
+  flex: 0 0 auto;
+  color: var(--tanne);
+  content: "+";
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.archivveranstaltung[open] summary::after {
+  content: "−";
+}
+
+.archivveranstaltung summary strong,
+.archivveranstaltung summary small {
+  display: block;
+}
+
+.archivveranstaltung summary small {
+  margin-top: 3px;
+  color: var(--text-hell);
+}
+
+.archivveranstaltung__werte {
+  display: flex;
+  margin-left: auto;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.archivveranstaltung__werte span {
+  padding: 6px 9px;
+  border-radius: 8px;
+  background: var(--weihnachtsgold-hell);
+  color: var(--tanne-dunkel);
+  font-size: 0.88rem;
+  font-weight: 750;
+}
+
+.archivtabelle thead th,
+.archivtabelle tbody td {
+  padding-right: 20px;
+  padding-left: 20px;
 }
 
 .formularseite {
@@ -727,6 +841,30 @@ h5 {
 
   .einstellungenraster {
     grid-template-columns: 1fr;
+  }
+
+  .bereichskopf,
+  .archivkopf,
+  .archivveranstaltung summary {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .archivsummen,
+  .archivveranstaltung__werte {
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+
+  .archivveranstaltung summary {
+    position: relative;
+    padding-right: 48px;
+  }
+
+  .archivveranstaltung summary::after {
+    position: absolute;
+    top: 18px;
+    right: 20px;
   }
 
   .kennzahl {

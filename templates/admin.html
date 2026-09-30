@@ -41,6 +41,17 @@
 </section>
 
 <section class="tabellenbereich">
+  <div class="bereichskopf">
+    <div>
+      <p class="kennzeichnung">Aktuelle Veranstaltung</p>
+      <h2>Anmeldungen {{ settings.dinner_date.year }}</h2>
+    </div>
+    {% if signups %}
+    <form method="post" action="{{ url_for('archive_signups') }}">
+      <button type="submit" class="btn btn-secondary" onclick="return confirm('Alle aktuellen Anmeldungen archivieren und die aktuelle Liste leeren?');">Liste archivieren</button>
+    </form>
+    {% endif %}
+  </div>
   <div class="table-responsive">
     <table class="table anmeldetabelle align-middle">
       <thead>
@@ -74,5 +85,58 @@
       </tbody>
     </table>
   </div>
+</section>
+
+<section class="archivbereich">
+  <div class="bereichskopf archivkopf">
+    <div>
+      <p class="kennzeichnung">Langfristige Auswertung</p>
+      <h2>Archiv &amp; Statistik</h2>
+    </div>
+    <div class="archivsummen" aria-label="Gesamtsummen des Archivs">
+      <span><strong>{{ archiv_veranstaltungen|length }}</strong> Veranstaltungen</span>
+      <span><strong>{{ archiv_anmeldungen }}</strong> Anmeldungen</span>
+      <span><strong>{{ archiv_personen }}</strong> Personen</span>
+    </div>
+  </div>
+
+  {% for veranstaltung in archiv_veranstaltungen %}
+  <details class="archivveranstaltung" {% if loop.first %}open{% endif %}>
+    <summary>
+      <span>
+        <strong>Weihnachtsessen {{ veranstaltung.veranstaltungsdatum.year }}</strong>
+        <small>{{ veranstaltung.veranstaltungsdatum|datum }}</small>
+      </span>
+      <span class="archivveranstaltung__werte">
+        <span>{{ veranstaltung.anmeldezahl }} Anmeldungen</span>
+        <span>{{ veranstaltung.gesamtpersonen }} Personen</span>
+      </span>
+    </summary>
+    <div class="table-responsive">
+      <table class="table anmeldetabelle archivtabelle align-middle">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Rufzeichen</th>
+            <th>Zusätzliche Personen</th>
+            <th>Gesamt</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for anmeldung in veranstaltung.anmeldungen %}
+          <tr>
+            <td>{{ anmeldung.name }}</td>
+            <td>{{ anmeldung.rufzeichen or '-' }}</td>
+            <td>{{ anmeldung.zusaetzliche_personen }}</td>
+            <td>{{ anmeldung.personen }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </details>
+  {% else %}
+  <p class="leerzustand">Noch keine vergangenen Veranstaltungen archiviert.</p>
+  {% endfor %}
 </section>
 {% endblock %}

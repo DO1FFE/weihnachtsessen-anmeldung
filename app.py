@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-from datetime import date
+from datetime import date, datetime, timezone
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 from sqlalchemy import inspect, text
@@ -66,6 +66,66 @@ class EventSettings(db.Model):
     signup_enabled = db.Column(db.Boolean, nullable=False, default=True, server_default='1')
 
 
+class ArchivVeranstaltung(db.Model):
+    __tablename__ = 'archiv_veranstaltung'
+
+    id = db.Column(db.Integer, primary_key=True)
+    veranstaltungsdatum = db.Column(db.Date, nullable=False, unique=True)
+    anmeldefrist = db.Column(db.Date)
+    archiviert_am = db.Column(
+        db.DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc),
+    )
+    anmeldungen = db.relationship(
+        'ArchivAnmeldung',
+        back_populates='veranstaltung',
+        cascade='all, delete-orphan',
+        order_by='ArchivAnmeldung.id',
+    )
+
+    @property
+    def anmeldezahl(self):
+        return len(self.anmeldungen)
+
+    @property
+    def gesamtpersonen(self):
+        return sum(anmeldung.personen for anmeldung in self.anmeldungen)
+
+
+class ArchivAnmeldung(db.Model):
+    __tablename__ = 'archiv_anmeldung'
+    __table_args__ = (
+        db.UniqueConstraint(
+            'veranstaltung_id',
+            'urspruengliche_anmeldung_id',
+            name='uq_archiv_anmeldung_veranstaltung',
+        ),
+    )
+
+    id = db.Column(db.Integer, primary_key=True)
+    veranstaltung_id = db.Column(
+        db.Integer,
+        db.ForeignKey('archiv_veranstaltung.id'),
+        nullable=False,
+        index=True,
+    )
+    urspruengliche_anmeldung_id = db.Column(db.Integer, nullable=False)
+    name = db.Column(db.String(120), nullable=False)
+    rufzeichen = db.Column(db.String(80))
+    zusaetzliche_personen = db.Column(db.Integer, nullable=False, default=0)
+    archiviert_am = db.Column(
+        db.DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc),
+    )
+    veranstaltung = db.relationship('ArchivVeranstaltung', back_populates='anmeldungen')
+
+    @property
+    def personen(self):
+        return 1 + (self.zusaetzliche_personen or 0)
+
+
 def ensure_event_settings_schema():
     inspector = inspect(db.engine)
     if not inspector.has_table(EventSettings.__tablename__):
@@ -117,6 +177,40 @@ def parse_date_field(field_name, fallback):
 def total_persons():
     result = db.session.query(db.func.sum(Signup.additional + 1)).scalar()
     return result or 0
+
+
+def archiviere_anmeldungen(veranstaltungsdatum, anmeldefrist):
+    anmeldungen = Signup.query.order_by(Signup.id).all()
+    if not anmeldungen:
+        raise ValueError('Es sind keine aktuellen Anmeldungen zum Archivieren vorhanden.')
+
+    vorhandenes_archiv = ArchivVeranstaltung.query.filter_by(
+        veranstaltungsdatum=veranstaltungsdatum
+    ).first()
+    if vorhandenes_archiv:
+        raise ValueError('Für dieses Veranstaltungsdatum ist bereits ein Archiv vorhanden.')
+
+    archiviert_am = datetime.now(timezone.utc)
+    veranstaltung = ArchivVeranstaltung(
+        veranstaltungsdatum=veranstaltungsdatum,
+        anmeldefrist=anmeldefrist,
+        archiviert_am=archiviert_am,
+    )
+    db.session.add(veranstaltung)
+
+    for anmeldung in anmeldungen:
+        veranstaltung.anmeldungen.append(
+            ArchivAnmeldung(
+                urspruengliche_anmeldung_id=anmeldung.id,
+                name=anmeldung.name,
+                rufzeichen=anmeldung.callsign,
+                zusaetzliche_personen=anmeldung.additional or 0,
+                archiviert_am=archiviert_am,
+            )
+        )
+        db.session.delete(anmeldung)
+
+    return veranstaltung
 
 
 def get_signup_status(settings):
@@ -213,8 +307,20 @@ def admin():
     signups = Signup.query.all()
     total = total_persons()
     settings = get_event_settings()
+    archiv_veranstaltungen = ArchivVeranstaltung.query.order_by(
+        ArchivVeranstaltung.veranstaltungsdatum.desc()
+    ).all()
+    archiv_anmeldungen = sum(
+        veranstaltung.anmeldezahl for veranstaltung in archiv_veranstaltungen
+    )
+    archiv_personen = sum(
+        veranstaltung.gesamtpersonen for veranstaltung in archiv_veranstaltungen
+    )
     return render_template('admin.html', signups=signups, total_persons=total,
-                           settings=settings)
+                           settings=settings,
+                           archiv_veranstaltungen=archiv_veranstaltungen,
+                           archiv_anmeldungen=archiv_anmeldungen,
+                           archiv_personen=archiv_personen)
 
 
 @app.route('/admin/settings', methods=['POST'])
@@ -238,6 +344,35 @@ def update_settings():
     settings.signup_enabled = request.form.get('signup_enabled') == '1'
     db.session.commit()
     flash('Termineinstellungen wurden gespeichert.')
+    return redirect(url_for('admin'))
+
+
+@app.route('/admin/archive', methods=['POST'])
+@requires_auth
+def archive_signups():
+    """Archiviere alle aktuellen Anmeldungen für die eingestellte Veranstaltung."""
+    settings = get_event_settings()
+    try:
+        veranstaltung = archiviere_anmeldungen(
+            settings.dinner_date,
+            settings.signup_deadline,
+        )
+        settings.signup_enabled = False
+        db.session.commit()
+    except ValueError as fehler:
+        db.session.rollback()
+        flash(str(fehler))
+        return redirect(url_for('admin'))
+    except Exception:
+        db.session.rollback()
+        app.logger.exception('Die Anmeldungen konnten nicht archiviert werden.')
+        flash('Die Anmeldungen konnten nicht archiviert werden.')
+        return redirect(url_for('admin'))
+
+    flash(
+        f'{veranstaltung.anmeldezahl} Anmeldungen mit '
+        f'{veranstaltung.gesamtpersonen} Personen wurden archiviert.'
+    )
     return redirect(url_for('admin'))
 
 
